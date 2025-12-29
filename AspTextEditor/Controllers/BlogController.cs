@@ -1,5 +1,7 @@
 ﻿using AspTextEditor.Models;
+using AspTextEditor.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -12,45 +14,58 @@ namespace AspTextEditor.Controllers
     public class BlogController : Controller
     {
         private readonly AspTextEditor.Data.DB _db;
+        private readonly UserManager<AppUser> _um;
 
-        public BlogController(Data.DB db)
+        public BlogController(Data.DB db, UserManager<AppUser> um)
         {
             _db = db;
+            _um = um;
         }
 
         public async Task<IActionResult> Index()
         {
-            List<BlogPage> pages = await _db.BlogPages
+            Dictionary<string, string> pages = await _db.BlogPages
                 .OrderByDescending(p => p.CreatedAt)
-                .ToListAsync();
+                .ToDictionaryAsync(i => i.Slug, j => j.Title);
             return View(pages);
         }
 
+        [HttpGet("Blog/Page/{slug}")]
         public async Task<IActionResult> Page(string slug)
         {
             BlogPage? page = await _db.BlogPages
                 .FirstOrDefaultAsync(p => p.Slug == slug);
             if (page == null) return NotFound();
-
-            return View(page);
+            BlogPageViewModel viewModel = new BlogPageViewModel(page);
+            return View(viewModel);
         }
 
 
         [Authorize]
-        public IActionResult Create() => View();
+        public IActionResult Create() => View("Edit", new BlogPageViewModel());
 
         [HttpPost]
         [Authorize]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(BlogPage model)
+        public async Task<IActionResult> Create(BlogPageViewModel model)
         {
             if (!ModelState.IsValid)
-                return View(model);
+                return View("Edit", model);
 
             model.CreatedAt = DateTime.UtcNow;
-            model.AuthorName = User.Identity!.Name!;
+            AppUser? author = await _um.GetUserAsync(HttpContext.User);
+            if (author == null)
+                return BadRequest("NO SUCH USER");
+            BlogPage newPage = new BlogPage
+            {
+                Title = model.Title,
+                Slug = model.Slug,
+                HtmlContent = model.HtmlContent,
+                Author = author,
+                CreatedAt = DateTime.UtcNow,
+            };
 
-            _db.BlogPages.Add(model);
+            _db.BlogPages.Add(newPage);
             await _db.SaveChangesAsync();
 
             return RedirectToAction("Index");
@@ -62,14 +77,14 @@ namespace AspTextEditor.Controllers
             BlogPage? page = await _db.BlogPages
                 .FirstOrDefaultAsync(p => p.Slug == slug);
             if (page == null) return NotFound();
-
-            return View("Create", page);
+            BlogPageViewModel viewModel = new BlogPageViewModel(page);
+            return View(viewModel);
         }
 
         [HttpPost]
         [Authorize]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(BlogPage model)
+        public async Task<IActionResult> Edit(BlogPageViewModel model)
         {
             if (!ModelState.IsValid)
                 return View(model);
@@ -87,7 +102,5 @@ namespace AspTextEditor.Controllers
 
             return RedirectToAction("Page", new { id = page.Slug });
         }
-
-
     }
 }

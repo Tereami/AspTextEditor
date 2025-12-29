@@ -1,0 +1,26 @@
+﻿@model AspTextEditor.ViewModels.BlogPageViewModel
+
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<h1>@Model.Title</h1>
+
+@if (User.Identity!.IsAuthenticated)
+{
+    <p>
+        <a asp-action="Edit" asp-route-slug="@Model.Slug">Редактировать</a>
+    </p>
+}
+else
+{
+    <p>
+        <a asp-controller="Account" asp-action="Login" asp-route-slug="@Model.Slug">Войдите</a>, чтобы отредактировать
+    </p>
+}
+
+
+<div>
+    @Html.Raw(Model.HtmlContent);
+</div>
+

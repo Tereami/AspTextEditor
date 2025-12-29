@@ -1,0 +1,29 @@
+﻿@model AspTextEditor.ViewModels.BlogPageViewModel
+
+@{
+    ViewData["Title"] = "Редактирование записи";
+    string actionName = Model.Id == 0 ? "Create" : "Edit";
+}
+
+<form asp-action="@actionName" method="post" asp-antiforgery="true" class="modal-body small">
+    <input type="hidden" asp-for="@Model.Id" />
+    <div asp-validation-summary="ModelOnly"></div>
+    <div class="mb-3">
+        <label asp-for="@Model.Title" class="form-label">Название:</label>
+        <input asp-for="@Model.Title" required class="form-control" />
+        <span asp-validation-for="@Model.Title"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="@Model.Slug" class="form-label">Идентификатор (URL):</label>
+        <input asp-for="@Model.Slug" required class="form-control" placeholder="a_little_story" />
+        <span asp-validation-for="@Model.Slug"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="@Model.HtmlContent" class="form-label">Текст статьи:</label>
+        <textarea asp-for="@Model.HtmlContent" required class="form-control"></textarea>
+        <span asp-validation-for="@Model.HtmlContent"></span>
+    </div>
+    <div class="d-grid mb-3">
+        <input type="submit" class="btn btn-primary" value="Сохранить">
+    </div>
+</form>

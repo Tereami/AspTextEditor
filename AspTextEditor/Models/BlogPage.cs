@@ -21,6 +21,6 @@ namespace AspTextEditor.Models
         public DateTime CreatedAt { get; set; }
         public DateTime? LastUpdatedAt { get; set; }
 
-        public string AuthorName { get; set; } = string.Empty;
+        public AppUser Author { get; set; }
     }
 }

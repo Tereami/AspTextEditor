@@ -5,6 +5,7 @@
 <h1 class="display-4">Asp Text Editor application </h1>
 
 <div class="text-center">
+    
     @if (User.Identity!.IsAuthenticated)
     {
         <p>
@@ -21,4 +22,7 @@
             <a asp-controller="Account" asp-action="Login">Вход</a>
         </p>
     }
+    <p>
+        <a asp-controller="Blog" asp-action="Index">Все записи блога</a>
+    </p>
 </div>

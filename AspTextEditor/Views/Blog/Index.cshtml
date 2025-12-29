@@ -1,0 +1,22 @@
+﻿@model Dictionary<string, string>
+@{
+    ViewData["Title"] = "Блог";
+}
+
+<h1 class="display-4">Записи в блоге:</h1>
+
+<div class="text-center">
+    <p>
+        <a asp-controller="Blog" asp-action="Create">
+            <i>Добавить запись...</i>
+        </a>
+    </p>
+    @foreach (var bp in Model)
+    {
+        <p>
+            <a asp-controller="Blog" asp-action="Page" asp-route-slug="@bp.Key">
+                @bp.Value
+            </a>
+        </p>
+    }
+</div>
