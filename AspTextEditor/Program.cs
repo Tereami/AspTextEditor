@@ -1,5 +1,6 @@
 using AspTextEditor.Data;
 using AspTextEditor.Models;
+using AspTextEditor.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -61,6 +62,8 @@ namespace AspTextEditor
                 o.LoginPath = "/Account/Login";
                 o.SlidingExpiration = true;
             });
+
+            builder.Services.AddSingleton<HtmlSanitizerService>();
 
 
             var app = builder.Build();

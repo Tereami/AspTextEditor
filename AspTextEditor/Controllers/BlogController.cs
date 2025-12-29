@@ -1,4 +1,5 @@
 ﻿using AspTextEditor.Models;
+using AspTextEditor.Services;
 using AspTextEditor.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -15,11 +16,13 @@ namespace AspTextEditor.Controllers
     {
         private readonly AspTextEditor.Data.DB _db;
         private readonly UserManager<AppUser> _um;
+        private readonly HtmlSanitizerService _sanitizer;
 
-        public BlogController(Data.DB db, UserManager<AppUser> um)
+        public BlogController(Data.DB db, UserManager<AppUser> um, HtmlSanitizerService hss)
         {
             _db = db;
             _um = um;
+            _sanitizer = hss;
         }
 
         public async Task<IActionResult> Index()
@@ -62,7 +65,7 @@ namespace AspTextEditor.Controllers
                 Id = model.Id,
                 Title = model.Title,
                 Slug = model.Slug,
-                HtmlContent = model.HtmlContent,
+                HtmlContent = _sanitizer.Sanitize(model.HtmlContent),
                 Author = author,
                 CreatedAt = DateTime.UtcNow,
             };
@@ -97,7 +100,7 @@ namespace AspTextEditor.Controllers
 
             page.Title = model.Title;
             page.Slug = model.Slug;
-            page.HtmlContent = model.HtmlContent;
+            page.HtmlContent = _sanitizer.Sanitize(model.HtmlContent);
             page.LastUpdatedAt = DateTime.UtcNow;
 
             await _db.SaveChangesAsync();
