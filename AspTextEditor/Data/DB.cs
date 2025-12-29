@@ -8,5 +8,7 @@ namespace AspTextEditor.Data
     public class DB : IdentityDbContext<AppUser>
     {
         public DB(DbContextOptions options) : base(options) { }
+
+        public DbSet<BlogPage> BlogPages => Set<BlogPage>();
     }
 }
