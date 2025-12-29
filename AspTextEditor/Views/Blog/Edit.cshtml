@@ -1,8 +1,13 @@
 ﻿@model AspTextEditor.ViewModels.BlogPageViewModel
 
 @{
-    ViewData["Title"] = "Редактирование записи";
-    string actionName = Model.Id == 0 ? "Create" : "Edit";
+    string actionName = "Create";
+    ViewData["Title"] = "Новая запись";
+    if (Model.Id != 0)
+    {
+        actionName = "Edit";
+        ViewData["Title"] = "Редактирование записи";
+    }
 }
 
 <form asp-action="@actionName" method="post" asp-antiforgery="true" class="modal-body small">
@@ -20,10 +25,31 @@
     </div>
     <div class="mb-3">
         <label asp-for="@Model.HtmlContent" class="form-label">Текст статьи:</label>
-        <textarea asp-for="@Model.HtmlContent" required class="form-control"></textarea>
+        <textarea asp-for="@Model.HtmlContent" required class="form-control" id="editor"></textarea>
         <span asp-validation-for="@Model.HtmlContent"></span>
     </div>
     <div class="d-grid mb-3">
         <input type="submit" class="btn btn-primary" value="Сохранить">
     </div>
 </form>
+
+
+@section Scripts {
+    <script src="https://cdn.tiny.cloud/1/mone07kdk6nn8rrqo3id6xy4y5wdxh8vkmmk3kgedt762qve/tinymce/8/tinymce.min.js"></script>
+    <script>
+        tinymce.init({
+            selector: '#editor',
+            height: 500,
+            plugins: 'image link lists code',
+            toolbar: 'undo redo | blocks | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify | outdent indent | bullist numlist | image | code',
+            images_upload_url: '/upload/image',
+            automatic_uploads: true,
+            uploadcare_public_key: '9da9c7d787cd0b1feb79',
+            setup: function (editor) {
+                editor.on('change', function () {
+                    tinymce.triggerSave();
+                });
+            }
+        });
+    </script>
+}

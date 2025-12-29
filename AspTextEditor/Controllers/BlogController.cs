@@ -34,6 +34,7 @@ namespace AspTextEditor.Controllers
         public async Task<IActionResult> Page(string slug)
         {
             BlogPage? page = await _db.BlogPages
+                .Include(p => p.Author)
                 .FirstOrDefaultAsync(p => p.Slug == slug);
             if (page == null) return NotFound();
             BlogPageViewModel viewModel = new BlogPageViewModel(page);
@@ -58,6 +59,7 @@ namespace AspTextEditor.Controllers
                 return BadRequest("NO SUCH USER");
             BlogPage newPage = new BlogPage
             {
+                Id = model.Id,
                 Title = model.Title,
                 Slug = model.Slug,
                 HtmlContent = model.HtmlContent,
@@ -90,7 +92,7 @@ namespace AspTextEditor.Controllers
                 return View(model);
 
             BlogPage? page = await _db.BlogPages
-                .FirstOrDefaultAsync(p => p.Id == model.Id);
+                .FirstOrDefaultAsync(p => p.Slug == model.Slug);
             if (page == null) return NotFound();
 
             page.Title = model.Title;
@@ -100,7 +102,7 @@ namespace AspTextEditor.Controllers
 
             await _db.SaveChangesAsync();
 
-            return RedirectToAction("Page", new { id = page.Slug });
+            return RedirectToAction("Page", new { slug = page.Slug });
         }
     }
 }

@@ -4,6 +4,8 @@
     ViewData["Title"] = Model.Title;
 }
 
+<a asp-controller="Blog" asp-action="Index">&lt;&lt; Ко всем записям блога</a>
+
 <h1>@Model.Title</h1>
 
 @if (User.Identity!.IsAuthenticated)
@@ -21,6 +23,10 @@ else
 
 
 <div>
-    @Html.Raw(Model.HtmlContent);
+    @Html.Raw(Model.HtmlContent)
 </div>
 
+<hr />
+<p>
+    Автор: @(Model.AuthorName), @(Model.CreatedAt)
+</p>
