@@ -43,7 +43,9 @@
             plugins: 'image link lists code',
             toolbar: 'undo redo | blocks | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify | outdent indent | bullist numlist | image | code',
             images_upload_url: '/upload/image',
-            automatic_uploads: true,
+            relative_urls: false,
+            convert_urls: false,
+
             uploadcare_public_key: '9da9c7d787cd0b1feb79',
             setup: function (editor) {
                 editor.on('change', function () {
