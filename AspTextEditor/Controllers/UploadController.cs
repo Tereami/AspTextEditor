@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -12,11 +13,12 @@ namespace AspTextEditor.Controllers
     [Authorize]
     public class UploadController : Controller
     {
-        private string uploadsFolder = "uploads";
+        private string uploadsFolder = string.Empty;
         private readonly IWebHostEnvironment _env;
-        public UploadController(IWebHostEnvironment env)
+        public UploadController(IWebHostEnvironment env, IConfiguration conf)
         {
             _env = env;
+            uploadsFolder = conf["UploadedImagesPath"] ?? throw new Exception($"Invalid config file");
         }
 
 

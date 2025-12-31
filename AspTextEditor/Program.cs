@@ -64,6 +64,7 @@ namespace AspTextEditor
             });
 
             builder.Services.AddSingleton<HtmlSanitizerService>();
+            builder.Services.AddScoped<ImageCleanerService>();
 
 
             var app = builder.Build();

@@ -17,12 +17,14 @@ namespace AspTextEditor.Controllers
         private readonly AspTextEditor.Data.DB _db;
         private readonly UserManager<AppUser> _um;
         private readonly HtmlSanitizerService _sanitizer;
+        private readonly ImageCleanerService _cleaner;
 
-        public BlogController(Data.DB db, UserManager<AppUser> um, HtmlSanitizerService hss)
+        public BlogController(Data.DB db, UserManager<AppUser> um, HtmlSanitizerService hss, ImageCleanerService cleaner)
         {
             _db = db;
             _um = um;
             _sanitizer = hss;
+            _cleaner = cleaner;
         }
 
         public async Task<IActionResult> Index()
@@ -89,23 +91,25 @@ namespace AspTextEditor.Controllers
         [HttpPost]
         [Authorize]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(BlogPageViewModel model)
+        public async Task<IActionResult> Edit(BlogPageViewModel editedPage)
         {
             if (!ModelState.IsValid)
-                return View(model);
+                return View(editedPage);
 
-            BlogPage? page = await _db.BlogPages
-                .FirstOrDefaultAsync(p => p.Slug == model.Slug);
-            if (page == null) return NotFound();
+            BlogPage? existedPage = await _db.BlogPages
+                .FirstOrDefaultAsync(p => p.Slug == editedPage.Slug);
+            if (existedPage == null) return NotFound();
 
-            page.Title = model.Title;
-            page.Slug = model.Slug;
-            page.HtmlContent = _sanitizer.Sanitize(model.HtmlContent);
-            page.LastUpdatedAt = DateTime.UtcNow;
+            _cleaner.RemoveUnusedImages(existedPage.HtmlContent, editedPage.HtmlContent);
+
+            existedPage.Title = editedPage.Title;
+            existedPage.Slug = editedPage.Slug;
+            existedPage.HtmlContent = _sanitizer.Sanitize(editedPage.HtmlContent);
+            existedPage.LastUpdatedAt = DateTime.UtcNow;
 
             await _db.SaveChangesAsync();
 
-            return RedirectToAction("Page", new { slug = page.Slug });
+            return RedirectToAction("Page", new { slug = existedPage.Slug });
         }
     }
 }
